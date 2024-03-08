@@ -1,4 +1,4 @@
-# iceberg_cortex_demo
+# Iceberg & Cortex demo
 
 1. Run through line 43 of demo.sql in your Snowflake SQL worksheet. External Volume setup instructions can be found [here](https://docs.snowflake.com/en/user-guide/tables-iceberg-configure-external-volume#configure-an-external-volume-for-amazon-s3).
 2. Run through snowpark.ipynb cells, and stop after writing jan_df to the Iceberg table (save_as_table).
