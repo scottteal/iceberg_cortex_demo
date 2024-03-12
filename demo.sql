@@ -72,11 +72,31 @@ GROUP BY 1;
 -- Create a secure view to be shared
 CREATE OR REPLACE SECURE VIEW demo.public.product_sentiment
 AS
+WITH jan AS (
+    SELECT
+        product_name,
+        AVG(sentiment) AS avg_sentiment
+    FROM demo.public.product_reviews
+    WHERE MONTHNAME(review_date) = 'Jan'
+    GROUP BY 1
+)
+, feb AS (
+    SELECT
+        product_name,
+        AVG(sentiment) AS avg_sentiment
+    FROM demo.public.product_reviews
+    WHERE MONTHNAME(review_date) = 'Feb'
+    GROUP BY 1
+)
 SELECT
-    product_name,
-    AVG(sentiment) AS avg_sentiment
-FROM demo.public.product_reviews
-GROUP BY 1;
+    COALESCE(j.product_name, f.product_name) AS product_name,
+    j.avg_sentiment AS jan_sentiment,
+    f.avg_sentiment AS feb_sentiment
+FROM jan j
+FULL OUTER JOIN feb f
+    ON j.product_name = f.product_name
+ORDER BY jan_sentiment DESC
+;
 
 -- Use UI to create a reader account
 -- Use UI to create a share with reader account and add both secure views to share
