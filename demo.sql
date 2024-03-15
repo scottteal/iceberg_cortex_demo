@@ -31,6 +31,12 @@ CREATE OR REPLACE ICEBERG TABLE demo.public.product_reviews (
 ;
 SELECT * FROM demo.public.product_reviews LIMIT 10;
 
+-- Create a file format to specify how CSVs should be parsed
+CREATE OR REPLACE FILE FORMAT csv_ff
+    TYPE = 'CSV'
+    FIELD_OPTIONALLY_ENCLOSED_BY = '"'
+    SKIP_HEADER = 1;
+
 -- Create a stage to store the CSV files
 CREATE OR REPLACE STAGE demo.public.files
     FILE_FORMAT = csv_ff
