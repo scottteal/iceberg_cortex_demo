@@ -31,12 +31,6 @@ CREATE OR REPLACE ICEBERG TABLE demo.public.product_reviews (
 ;
 SELECT * FROM demo.public.product_reviews LIMIT 10;
 
--- Create a file format to specify how CSVs should be parsed
-CREATE OR REPLACE FILE FORMAT csv_ff
-    TYPE = 'CSV'
-    FIELD_OPTIONALLY_ENCLOSED_BY = '"'
-    SKIP_HEADER = 1;
-
 -- Create a stage to store the CSV files
 CREATE OR REPLACE STAGE demo.public.files
     FILE_FORMAT = csv_ff
@@ -60,23 +54,16 @@ FROM (
 ) s
 WHERE pr.id = s.id;
 
--- Create a secure view to be shared
-CREATE OR REPLACE SECURE VIEW demo.public.reviews_per_day
-AS
-SELECT
-    review_date,
-    COUNT(DISTINCT id) AS num_reviews
-FROM demo.public.product_reviews
-GROUP BY 1;
+-- Use UI to create a reader account
+-- Use UI to create a share with reader account and add both secure views to share
 
--- Create a secure view to be shared
-CREATE OR REPLACE SECURE VIEW demo.public.product_sentiment
-AS
+-- Query
+-- For each product, what was the change in sentiment from January to February?
 WITH jan AS (
     SELECT
         product_name,
         AVG(sentiment) AS avg_sentiment
-    FROM demo.public.product_reviews
+    FROM shared_product_reviews.public.product_reviews
     WHERE MONTHNAME(review_date) = 'Jan'
     GROUP BY 1
 )
@@ -84,23 +71,19 @@ WITH jan AS (
     SELECT
         product_name,
         AVG(sentiment) AS avg_sentiment
-    FROM demo.public.product_reviews
+    FROM shared_product_reviews.public.product_reviews
     WHERE MONTHNAME(review_date) = 'Feb'
     GROUP BY 1
 )
 SELECT
     COALESCE(j.product_name, f.product_name) AS product_name,
     j.avg_sentiment AS jan_sentiment,
-    f.avg_sentiment AS feb_sentiment
+    f.avg_sentiment AS feb_sentiment,
+    feb_sentiment - jan_sentiment AS sentiment_diff
 FROM jan j
 FULL OUTER JOIN feb f
     ON j.product_name = f.product_name
-ORDER BY jan_sentiment DESC
-;
-
--- Use UI to create a reader account
--- Use UI to create a share with reader account and add both secure views to share
-
+ORDER BY sentiment_diff DESC;
 
 --Reload
 DELETE FROM demo.public.product_reviews
