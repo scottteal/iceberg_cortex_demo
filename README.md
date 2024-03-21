@@ -1,4 +1,5 @@
 # Iceberg & Cortex demo
+This demo will show you how you can easily use Snowflake Cortex LLM functions for AI-powered text analysis on Iceberg tables. A blog post with step-by-step instructions are available [here](https://medium.com/snowflake/how-to-use-llama-2-on-iceberg-tables-for-sentiment-analysis-with-snowflake-cortex-32c030a8102b).
 
 1. Run through line 43 of demo.sql in your Snowflake SQL worksheet. External Volume setup instructions can be found [here](https://docs.snowflake.com/en/user-guide/tables-iceberg-configure-external-volume#configure-an-external-volume-for-amazon-s3).
 2. Run through snowpark.ipynb cells, and stop after writing jan_df to the Iceberg table (save_as_table).
