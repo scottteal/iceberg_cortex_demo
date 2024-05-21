@@ -33,7 +33,7 @@ CREATE OR REPLACE ICEBERG TABLE demo.public.product_reviews (
 SELECT * FROM demo.public.product_reviews LIMIT 10;
 
 -- Create a file format to specify how CSVs should be parsed
-CREATE OR REPLACE FILE FORMAT csv_ff
+CREATE OR REPLACE FILE FORMAT demo.public.csv_ff
     TYPE = 'CSV'
     FIELD_OPTIONALLY_ENCLOSED_BY = '"'
     SKIP_HEADER = 1;
@@ -44,7 +44,7 @@ CREATE OR REPLACE STAGE demo.public.files
     DIRECTORY = (ENABLED = TRUE);
 
 -- Create a stream to capture new records in the Iceberg table
-CREATE STREAM product_reviews_stream ON TABLE product_reviews;
+CREATE STREAM demo.public.product_reviews_stream ON TABLE demo.public.product_reviews;
 
 -- Create task to process new records with Cortex sentiment LLM function
 CREATE OR REPLACE TASK cortex_sentiment_score
