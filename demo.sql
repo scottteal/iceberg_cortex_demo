@@ -2,6 +2,7 @@
 CREATE OR REPLACE DATABASE demo;
 CREATE OR REPLACE WAREHOUSE demo_wh;
 USE DATABASE demo;
+USE SCHEMA demo.public;
 USE WAREHOUSE demo_wh;
 
 -- External Volume named s3_vol created in advance
