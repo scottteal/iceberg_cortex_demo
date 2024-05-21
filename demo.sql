@@ -23,7 +23,8 @@ CREATE OR REPLACE ICEBERG TABLE demo.public.product_reviews (
     product_id STRING,
     reviewer_name STRING,
     review_date DATE,
-    review STRING
+    review STRING,
+    sentiment FLOAT
 )
     CATALOG = 'SNOWFLAKE'
     EXTERNAL_VOLUME = 's3_vol'
@@ -56,7 +57,7 @@ FROM (
     SELECT
         id,
         snowflake.cortex.sentiment(review) AS stream_sentiment
-    FROM demo.public.product_reviews
+    FROM demo.public.product_reviews_stream
 ) s
 WHERE pr.id = s.id;
 
