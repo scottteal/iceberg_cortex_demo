@@ -1,7 +1,6 @@
 -- Create a separate database and warehouse for demo
 CREATE OR REPLACE DATABASE demo;
 CREATE OR REPLACE WAREHOUSE demo_wh;
-USE DATABASE demo;
 USE SCHEMA demo.public;
 USE WAREHOUSE demo_wh;
 
@@ -41,26 +40,21 @@ CREATE OR REPLACE FILE FORMAT demo.public.csv_ff
 
 -- Create a stage to store the CSV files
 CREATE OR REPLACE STAGE demo.public.files
-    FILE_FORMAT = csv_ff
+    FILE_FORMAT = demo.public.csv_ff
     DIRECTORY = (ENABLED = TRUE);
 
 -- Create a stream to capture new records in the Iceberg table
 CREATE STREAM demo.public.product_reviews_stream ON TABLE demo.public.product_reviews;
 
 -- Create task to process new records with Cortex sentiment LLM function
-CREATE OR REPLACE TASK cortex_sentiment_score
+CREATE OR REPLACE TASK demo.public.cortex_sentiment_score
     SCHEDULE = 'USING CRON 0 0 * * * America/Los_Angeles'
     USER_TASK_MANAGED_INITIAL_WAREHOUSE_SIZE = 'XSMALL'
 AS
-UPDATE demo.public.product_reviews pr
-SET sentiment = stream_sentiment
-FROM (
-    SELECT
-        id,
-        snowflake.cortex.sentiment(review) AS stream_sentiment
-    FROM demo.public.product_reviews_stream
-) s
-WHERE pr.id = s.id;
+UPDATE demo.public.product_reviews AS pr
+   SET sentiment = snowflake.cortex.sentiment(prs.review)
+  FROM demo.public.product_reviews_stream AS prs
+ WHERE prs.id = pr.id;
 
 -- Use UI to create a reader account
 -- Use UI to create a share with reader account and add both secure views to share
